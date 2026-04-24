@@ -69,16 +69,36 @@ if not plot_df.empty:
 
     fig = go.Figure()
 
+    # ----------------------
+    # GLOW LAYER (halo effect)
+    # ----------------------
+    fig.add_trace(go.Scattergeo(
+        lon=plot_df["lon"],
+        lat=plot_df["lat"],
+        mode="markers",
+        marker=dict(
+            size=18,
+            color="rgba(0, 150, 255, 0.25)",
+        ),
+        hoverinfo="skip",
+        showlegend=False
+    ))
+
+    # ----------------------
+    # MAIN SATELLITE POINTS
+    # ----------------------
     fig.add_trace(go.Scattergeo(
         lon=plot_df["lon"],
         lat=plot_df["lat"],
         text=plot_df["name"],
         mode="markers",
+
         marker=dict(
             size=8,
-            color="cyan",
-            line=dict(width=1)
+            color="red",
+            line=dict(width=1, color="black")
         ),
+
         hovertemplate=
         "🛰️ <b>%{text}</b><br>" +
         "Lat: %{lat:.2f}<br>" +
@@ -86,19 +106,29 @@ if not plot_df.empty:
         "<extra></extra>"
     ))
 
+    # ----------------------
+    # MAP STYLE (clean + transparent)
+    # ----------------------
     fig.update_layout(
         geo=dict(
-            projection_type="orthographic",  # 3D globe
+            projection_type="orthographic",
+
             showland=True,
             landcolor="rgb(240, 240, 240)",
+
             showocean=True,
             oceancolor="rgb(200, 220, 255)",
+
             showcountries=True,
             showcoastlines=True,
             coastlinecolor="gray",
 
-            bgcolor="rgba(0,0,0,0)"  # 🔥 transparent background
+            bgcolor="rgba(0,0,0,0)"
         ),
+
+        paper_bgcolor="rgba(0,0,0,0)",
+        plot_bgcolor="rgba(0,0,0,0)",
+
         margin=dict(l=0, r=0, t=0, b=0),
         height=600
     )
@@ -107,48 +137,6 @@ if not plot_df.empty:
 
 else:
     st.warning("No satellite positions available")
-
-fig = go.Figure()
-
-# ----------------------
-# GLOW LAYER (background halo)
-# ----------------------
-fig.add_trace(go.Scattergeo(
-    lon=plot_df["lon"],
-    lat=plot_df["lat"],
-    mode="markers",
-    marker=dict(
-        size=18,
-        color="rgba(0, 150, 255, 0.2)",  # soft glow
-    ),
-    hoverinfo="skip",
-    showlegend=False
-))
-
-# ----------------------
-# MAIN SATELLITE POINTS
-# ----------------------
-fig.add_trace(go.Scattergeo(
-    lon=plot_df["lon"],
-    lat=plot_df["lat"],
-    text=plot_df["name"],
-    mode="markers+text",
-    
-    textposition="top center",
-    
-    marker=dict(
-        size=8,
-        color="red",
-        line=dict(width=1, color="black")
-    ),
-
-    hovertemplate=
-    "🛰️ <b>%{text}</b><br>" +
-    "Lat: %{lat:.2f}<br>" +
-    "Lon: %{lon:.2f}<br>" +
-    "<extra></extra>"
-))
-
 # ----------------------
 # TABLE VIEW
 # ----------------------
