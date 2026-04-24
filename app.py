@@ -110,28 +110,31 @@ if not plot_df.empty:
     # MAP STYLE (clean + transparent)
     # ----------------------
     fig.update_layout(
-        geo=dict(
-            projection_type="orthographic",
+    geo=dict(
+        projection_type="orthographic",
 
-            showland=True,
-            landcolor="rgb(240, 240, 240)",
+        # 🔥 KEY FIX
+        domain=dict(x=[0.05, 0.95], y=[0.05, 0.95]),
 
-            showocean=True,
-            oceancolor="rgb(200, 220, 255)",
+        showland=True,
+        landcolor="rgb(240, 240, 240)",
 
-            showcountries=True,
-            showcoastlines=True,
-            coastlinecolor="gray",
+        showocean=True,
+        oceancolor="rgb(200, 220, 255)",
 
-            bgcolor="rgba(0,0,0,0)"
-        ),
+        showcountries=True,
+        showcoastlines=True,
+        coastlinecolor="gray",
 
-        paper_bgcolor="rgba(0,0,0,0)",
-        plot_bgcolor="rgba(0,0,0,0)",
+        bgcolor="rgba(0,0,0,0)"
+    ),
 
-        margin=dict(l=0, r=0, t=0, b=0),
-        height=600,
-    )
+    paper_bgcolor="rgba(0,0,0,0)",
+    plot_bgcolor="rgba(0,0,0,0)",
+
+    margin=dict(l=0, r=0, t=0, b=0),
+    height=850
+)
 
     st.plotly_chart(fig, use_container_width=True)
 
