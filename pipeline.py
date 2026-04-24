@@ -28,27 +28,37 @@ def fetch_tle():
 # PROCESSING
 # ----------------------
 def parse_tle(tle_text):
-    if not tle_text:
-        return pd.DataFrame(columns=["name", "line1", "line2"])
+    import pandas as pd
 
-    lines = tle_text.strip().split("\n")
+    columns = ["name", "line1", "line2"]
+
+    if not tle_text:
+        return pd.DataFrame(columns=columns)
+
+    # Clean lines
+    lines = [l.strip() for l in tle_text.split("\n") if l.strip()]
+
     records = []
 
-    for i in range(0, len(lines), 3):
-        try:
-            name = lines[i].strip()
-            l1 = lines[i + 1]
-            l2 = lines[i + 2]
+    i = 0
+    while i < len(lines) - 2:
+        name = lines[i]
+        l1 = lines[i + 1]
+        l2 = lines[i + 2]
 
+        # ✅ Strict validation
+        if l1.startswith("1 ") and l2.startswith("2 "):
             records.append({
                 "name": name,
                 "line1": l1,
                 "line2": l2
             })
-        except:
-            continue
+            i += 3
+        else:
+            # Skip bad alignment
+            i += 1
 
-    return pd.DataFrame(records)
+    return pd.DataFrame(records, columns=columns)
 
 
 # ----------------------
