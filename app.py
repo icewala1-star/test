@@ -59,3 +59,7 @@ st.write(sat_data)
 # ----------------------
 if st.checkbox("Show raw data"):
     st.dataframe(df)
+
+if df.empty:
+    st.error("Failed to fetch satellite data. Try again later.")
+    st.stop()
