@@ -131,7 +131,6 @@ if not plot_df.empty:
 
         margin=dict(l=0, r=0, t=0, b=0),
         height=600,
-        width=1000
     )
 
     st.plotly_chart(fig, use_container_width=True)
