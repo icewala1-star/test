@@ -3,7 +3,7 @@ import pandas as pd
 from datetime import datetime, UTC
 from sgp4.api import Satrec, jday
 
-URL = "https://celestrak.org/NORAD/elements/stations.txt"
+URL = "https://celestrak.org/NORAD/elements/gp.php?GROUP=stations&FORMAT=tle"
 FALLBACK_TLE = """ISS (ZARYA)
 1 25544U 98067A   26113.61927549  .00008948  00000+0  17083-3 0  9996
 2 25544  51.6320 210.1816 0006827 342.1760  17.8988 15.48912820563290
