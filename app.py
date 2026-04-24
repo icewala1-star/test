@@ -3,12 +3,11 @@ from pipeline import run_pipeline
 from datetime import datetime, UTC
 import plotly.graph_objects as go
 
-# ----------------------
 # PAGE CONFIG
 # ----------------------
 st.set_page_config(page_title="Satellite Dashboard", layout="wide")
 
-st.title("🛰️ Satellite Data Engineering Dashboard")
+st.title("🛰️ Satellite Dashboard")
 
 st.markdown("""
 This app demonstrates a mini data pipeline:
@@ -16,10 +15,9 @@ This app demonstrates a mini data pipeline:
 - Ingestion (CelesTrak)
 - Processing (TLE parsing)
 - Transformation (position computation)
-- Visualization (Streamlit + 3D Globe)
+- Visualization (Streamlit)
 """)
 
-# ----------------------
 # CACHE (2 HOURS)
 # ----------------------
 @st.cache_data(ttl=7200)
@@ -28,7 +26,6 @@ def load_data():
 
 df, ingestion_time = load_data()
 
-# ----------------------
 # VALIDATION
 # ----------------------
 required_cols = ["name", "lat", "lon", "timestamp"]
@@ -42,7 +39,6 @@ if df.empty or not all(col in df.columns for col in required_cols):
 
     st.stop()
 
-# ----------------------
 # METRICS
 # ----------------------
 col1, col2, col3 = st.columns(3)
@@ -51,14 +47,12 @@ col1.metric("Total Satellites", len(df))
 col2.metric("Ingestion Time (s)", round(ingestion_time, 3))
 col3.metric("Last Updated", datetime.now(UTC).strftime("%H:%M:%S"))
 
-# ----------------------
 # REFRESH BUTTON
 # ----------------------
 if st.button("🔄 Refresh Data"):
     st.cache_data.clear()
     st.rerun()
 
-# ----------------------
 # 3D GLOBE VISUALIZATION
 # ----------------------
 st.subheader("🌍 3D Satellite Globe")
@@ -69,7 +63,6 @@ if not plot_df.empty:
 
     fig = go.Figure()
 
-    # ----------------------
     # GLOW LAYER (halo effect)
     # ----------------------
     fig.add_trace(go.Scattergeo(
@@ -84,7 +77,6 @@ if not plot_df.empty:
         showlegend=False
     ))
 
-    # ----------------------
     # MAIN SATELLITE POINTS
     # ----------------------
     fig.add_trace(go.Scattergeo(
@@ -106,7 +98,6 @@ if not plot_df.empty:
         "<extra></extra>"
     ))
 
-    # ----------------------
     # MAP STYLE (clean + transparent)
     # ----------------------
     fig.update_layout(
@@ -139,14 +130,13 @@ if not plot_df.empty:
     st.plotly_chart(fig, width="stretch")
 else:
     st.warning("No satellite positions available")
-# ----------------------
+
 # TABLE VIEW
 # ----------------------
 st.subheader("📊 Satellite Data")
 
 st.dataframe(df[["name", "lat", "lon", "timestamp"]])
 
-# ----------------------
 # SATELLITE EXPLORER
 # ----------------------
 st.subheader("🔍 Satellite Explorer")
@@ -157,7 +147,6 @@ sat_data = df[df["name"] == selected]
 
 st.write(sat_data)
 
-# ----------------------
 # DEBUG PANEL
 # ----------------------
 with st.expander("⚙️ Debug Data"):

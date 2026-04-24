@@ -4,3 +4,4 @@ requests
 numpy
 sgp4
 plotly
+skyfield
