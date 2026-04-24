@@ -10,12 +10,15 @@ URL = "https://celestrak.org/NORAD/elements/stations.txt"
 # INGESTION
 # ----------------------
 def fetch_tle():
-    start_time = datetime.utcnow()
-    response = requests.get(URL)
-    data = response.text
-    end_time = datetime.utcnow()
+    try:
+        start_time = datetime.utcnow()
+        response = requests.get(URL, timeout=10)
+        data = response.text
+        end_time = datetime.utcnow()
 
-    return data, (end_time - start_time).total_seconds()
+        return data, (end_time - start_time).total_seconds()
+    except:
+        return "", 0
 
 
 # ----------------------
