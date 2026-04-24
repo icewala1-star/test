@@ -90,10 +90,14 @@ if not plot_df.empty:
         geo=dict(
             projection_type="orthographic",  # 3D globe
             showland=True,
-            landcolor="rgb(20, 20, 20)",
+            landcolor="rgb(240, 240, 240)",
             showocean=True,
-            oceancolor="rgb(10, 10, 30)",
+            oceancolor="rgb(200, 220, 255)",
             showcountries=True,
+            showcoastlines=True,
+            coastlinecolor="gray",
+
+            bgcolor="rgba(0,0,0,0)"  # 🔥 transparent background
         ),
         margin=dict(l=0, r=0, t=0, b=0),
         height=600
