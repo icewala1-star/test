@@ -136,8 +136,7 @@ if not plot_df.empty:
     height=850
 )
 
-    st.plotly_chart(fig, use_container_width=True)
-
+    st.plotly_chart(fig, width="stretch")
 else:
     st.warning("No satellite positions available")
 # ----------------------
