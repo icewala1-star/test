@@ -94,23 +94,44 @@ CYGNUS NG-24
 # INGESTION
 # ----------------------
 def fetch_tle():
+    import requests
+    from datetime import datetime, UTC
+
     try:
         start_time = datetime.now(UTC)
 
-        response = requests.get(URL, timeout=10)
+        headers = {
+            "User-Agent": "Mozilla/5.0",
+            "Accept": "text/plain"
+        }
 
-        # ❗ IMPORTANT: validate response
-        if response.status_code != 200 or not response.text.strip():
-            raise Exception("Empty response")
+        response = requests.get(
+            URL,
+            headers=headers,
+            timeout=15
+        )
 
-        data = response.text
         end_time = datetime.now(UTC)
 
-        return data, (end_time - start_time).total_seconds()
+        # 🔍 DEBUG LOGS
+        print("------ FETCH DEBUG ------")
+        print("Status Code:", response.status_code)
+        print("Headers:", response.headers)
+        print("Content Length:", len(response.text))
+        print("First 300 chars:\n", response.text[:300])
+        print("-------------------------")
+
+        if response.status_code != 200:
+            raise Exception(f"HTTP {response.status_code}")
+
+        if len(response.text.strip()) < 50:
+            raise Exception("Empty or blocked response")
+
+        return response.text, (end_time - start_time).total_seconds()
 
     except Exception as e:
-        print("Fetch failed, using fallback:", e)
-        return FALLBACK_TLE, 0
+        print("❌ Fetch failed:", e)
+        return None, 0
 
 
 # ----------------------
