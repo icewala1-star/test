@@ -1,6 +1,6 @@
 import requests
 import pandas as pd
-from datetime import datetime
+from datetime import datetime, UTC
 from sgp4.api import Satrec, jday
 
 URL = "https://celestrak.org/NORAD/elements/stations.txt"
@@ -11,28 +11,34 @@ URL = "https://celestrak.org/NORAD/elements/stations.txt"
 # ----------------------
 def fetch_tle():
     try:
-        start_time = datetime.utcnow()
+        start_time = datetime.now(UTC)
         response = requests.get(URL, timeout=10)
+        response.raise_for_status()
         data = response.text
-        end_time = datetime.utcnow()
+        end_time = datetime.now(UTC)
 
         return data, (end_time - start_time).total_seconds()
-    except:
-        return "", 0
+
+    except Exception as e:
+        print("Fetch error:", e)
+        return None, 0
 
 
 # ----------------------
 # PROCESSING
 # ----------------------
 def parse_tle(tle_text):
+    if not tle_text:
+        return pd.DataFrame(columns=["name", "line1", "line2"])
+
     lines = tle_text.strip().split("\n")
     records = []
 
     for i in range(0, len(lines), 3):
         try:
             name = lines[i].strip()
-            l1 = lines[i+1]
-            l2 = lines[i+2]
+            l1 = lines[i + 1]
+            l2 = lines[i + 2]
 
             records.append({
                 "name": name,
@@ -46,13 +52,13 @@ def parse_tle(tle_text):
 
 
 # ----------------------
-# TRANSFORMATION (POSITION)
+# POSITION COMPUTATION
 # ----------------------
 def compute_position(row):
     try:
         sat = Satrec.twoline2rv(row["line1"], row["line2"])
 
-        now = datetime.utcnow()
+        now = datetime.now(UTC)
         jd, fr = jday(
             now.year, now.month, now.day,
             now.hour, now.minute, now.second
@@ -60,13 +66,17 @@ def compute_position(row):
 
         e, r, v = sat.sgp4(jd, fr)
 
-        return r  # x, y, z coordinates
+        return r  # x, y, z
     except:
         return (None, None, None)
 
 
 def add_positions(df):
+    if df.empty:
+        return df
+
     positions = df.apply(compute_position, axis=1)
+
     df["x"] = [p[0] for p in positions]
     df["y"] = [p[1] for p in positions]
     df["z"] = [p[2] for p in positions]
@@ -75,12 +85,17 @@ def add_positions(df):
 
 
 # ----------------------
-# SIMPLE GEO CONVERSION (APPROXIMATION)
+# LAT/LON (SIMPLIFIED)
 # ----------------------
 def add_lat_lon(df):
-    # NOTE: This is a simplified conversion for demo purposes
+    if df.empty:
+        df["lat"] = []
+        df["lon"] = []
+        return df
+
     df["lat"] = df["y"] % 180 - 90
     df["lon"] = df["x"] % 360 - 180
+
     return df
 
 
@@ -90,10 +105,24 @@ def add_lat_lon(df):
 def run_pipeline():
     raw_data, ingestion_time = fetch_tle()
 
+    # Always return structured dataframe
+    columns = [
+        "name", "line1", "line2",
+        "x", "y", "z",
+        "lat", "lon", "timestamp"
+    ]
+
+    if not raw_data:
+        return pd.DataFrame(columns=columns), ingestion_time
+
     df = parse_tle(raw_data)
+
+    if df.empty:
+        return pd.DataFrame(columns=columns), ingestion_time
+
     df = add_positions(df)
     df = add_lat_lon(df)
 
-    df["timestamp"] = datetime.utcnow()
+    df["timestamp"] = datetime.now(UTC)
 
     return df, ingestion_time
