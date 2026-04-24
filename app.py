@@ -108,6 +108,47 @@ if not plot_df.empty:
 else:
     st.warning("No satellite positions available")
 
+fig = go.Figure()
+
+# ----------------------
+# GLOW LAYER (background halo)
+# ----------------------
+fig.add_trace(go.Scattergeo(
+    lon=plot_df["lon"],
+    lat=plot_df["lat"],
+    mode="markers",
+    marker=dict(
+        size=18,
+        color="rgba(0, 150, 255, 0.2)",  # soft glow
+    ),
+    hoverinfo="skip",
+    showlegend=False
+))
+
+# ----------------------
+# MAIN SATELLITE POINTS
+# ----------------------
+fig.add_trace(go.Scattergeo(
+    lon=plot_df["lon"],
+    lat=plot_df["lat"],
+    text=plot_df["name"],
+    mode="markers+text",
+    
+    textposition="top center",
+    
+    marker=dict(
+        size=8,
+        color="red",
+        line=dict(width=1, color="black")
+    ),
+
+    hovertemplate=
+    "🛰️ <b>%{text}</b><br>" +
+    "Lat: %{lat:.2f}<br>" +
+    "Lon: %{lon:.2f}<br>" +
+    "<extra></extra>"
+))
+
 # ----------------------
 # TABLE VIEW
 # ----------------------
